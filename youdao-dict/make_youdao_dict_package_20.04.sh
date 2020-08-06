@@ -1,5 +1,24 @@
 #!/bin/bash
 
+IS_FAKEROOT=false
+
+for path in ${LD_LIBRARY_PATH//:/ }; do
+        if [[ "$path" == *libfakeroot ]]; then
+                IS_FAKEROOT=true
+                break
+        fi
+done
+
+if [ "$IS_FAKEROOT" == "false" ]; then
+    echo "fakeroot is not running, exit."
+    echo "run 'fakeroot' first, then run me."
+    echo ""
+    exit
+else
+    echo "fakeroot is running, continue."
+fi 
+
+
 PKGNAME="youdao-dict"
 VERSION="6.0.0"
 ARCH="amd64"
@@ -8,14 +27,12 @@ GZFILEURL="http://codown.youdao.com/cidian/linux/$GZFILE"
 SRCFOLDER="$PKGNAME-$VERSION-$ARCH"
 MD5HASH="4ea02c47e14aeebfbb892b7a14dad67d"
 
-sudo apt-get install build-essential
+rm -rf build try
 
-sudo rm -rf build try
-
-rm -rf $GZFILE
-rm -rf $SRCFOLDER
-wget $GZFILEURL
-tar zxvf $GZFILE
+#rm -rf $GZFILE
+#rm -rf $SRCFOLDER
+#wget $GZFILEURL
+#tar zxvf $GZFILE
 
 MD5STR=`md5sum $GZFILE | awk '{ print $1 }'`
 
@@ -45,13 +62,12 @@ echo "Installed-Size: $SRCSIZE" >> try/DEBIAN/control
 echo "Description: Youdao Dict" >> try/DEBIAN/control
 echo "Maintainer: Maintainer <gzhechu@gmail.com>" >> try/DEBIAN/control
 echo "Section: utils" >> try/DEBIAN/control
-echo "Depends: tesseract-ocr, tesseract-ocr-eng, tesseract-ocr-chi-sim, python3-xdg, python3-opengl, python3-xlib" >> try/DEBIAN/control
+echo "Depends: python3-qtpy, python3-lxml, tesseract-ocr, tesseract-ocr-eng, tesseract-ocr-chi-sim, python3-xdg, python3-opengl, python3-xlib" >> try/DEBIAN/control
 echo "Homepage: https://cidian.youdao.com/" >> try/DEBIAN/control
 echo "Priority: optional" >> try/DEBIAN/control
 
 cd $SRCFOLDER
 PREFIX=../try/usr
-
 
 mkdir -p $PREFIX/bin
 mkdir -p $PREFIX/share/youdao-dict
@@ -69,7 +85,10 @@ chmod 755 $PREFIX/share/youdao-dict/main.py
 chmod 755 $PREFIX/share/youdao-dict/youdao-dict-backend.py
 BIN_PATH=$PREFIX/bin/youdao-dict
 ln -sf /usr/share/youdao-dict/main.py $BIN_PATH
-sudo chown -R root. $PREFIX
 
 cd ..
-sudo dpkg-deb --build try build
+dpkg-deb --build try build
+
+mv build/youdao-dict_6.0.0_amd64.deb youdao-dict_6.0.0_ubuntu_20.04_amd64.deb 
+
+

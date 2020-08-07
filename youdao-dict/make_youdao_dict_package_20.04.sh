@@ -10,15 +10,15 @@ for path in ${LD_LIBRARY_PATH//:/ }; do
 done
 
 if [ "$IS_FAKEROOT" == "false" ]; then
-    echo "fakeroot is not running, exit."
-    echo "run 'fakeroot' first, then run me."
-    echo ""
+    echo "fakeroot is not running,"
+    echo "please run 'fakeroot' first, then run me."
+    echo "exit."
     exit
 else
-    echo "fakeroot is running, continue."
+    echo "fakeroot is running, continue..."
 fi 
 
-
+OSVER=$(lsb_release -rs)
 PKGNAME="youdao-dict"
 VERSION="6.0.0"
 ARCH="amd64"
@@ -26,13 +26,15 @@ GZFILE="$PKGNAME-$VERSION-$ARCH.tar.gz"
 GZFILEURL="http://codown.youdao.com/cidian/linux/$GZFILE"
 SRCFOLDER="$PKGNAME-$VERSION-$ARCH"
 MD5HASH="4ea02c47e14aeebfbb892b7a14dad67d"
+DEBFILE="$PKGNAME"_"$VERSION"_"$ARCH.deb"
+RELEASEFILE="$PKGNAME"_"$VERSION"_"$OSVER"_"$ARCH.deb"
 
 rm -rf build try
 
-#rm -rf $GZFILE
-#rm -rf $SRCFOLDER
-#wget $GZFILEURL
-#tar zxvf $GZFILE
+rm -rf $GZFILE
+rm -rf $SRCFOLDER
+wget $GZFILEURL
+tar zxvf $GZFILE
 
 MD5STR=`md5sum $GZFILE | awk '{ print $1 }'`
 
@@ -56,7 +58,6 @@ echo "Package: $PKGNAME" > try/DEBIAN/control
 echo "Version: $VERSION" >> try/DEBIAN/control
 echo "Architecture: $ARCH" >> try/DEBIAN/control
 echo "Provides: $PKGNAME" >> try/DEBIAN/control
-echo "Conflicts: $PKGNAME" >> try/DEBIAN/control
 echo "Replaces: $PKGNAME" >> try/DEBIAN/control
 echo "Installed-Size: $SRCSIZE" >> try/DEBIAN/control
 echo "Description: Youdao Dict" >> try/DEBIAN/control
@@ -89,6 +90,4 @@ ln -sf /usr/share/youdao-dict/main.py $BIN_PATH
 cd ..
 dpkg-deb --build try build
 
-mv build/youdao-dict_6.0.0_amd64.deb youdao-dict_6.0.0_ubuntu_20.04_amd64.deb 
-
-
+mv build/$DEBFILE $RELEASEFILE

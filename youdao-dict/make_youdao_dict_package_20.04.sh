@@ -27,7 +27,7 @@ GZFILEURL="http://codown.youdao.com/cidian/linux/$GZFILE"
 SRCFOLDER="$PKGNAME-$VERSION-$ARCH"
 MD5HASH="4ea02c47e14aeebfbb892b7a14dad67d"
 DEBFILE="$PKGNAME"_"$VERSION"_"$ARCH.deb"
-RELEASEFILE="$PKGNAME"_"$VERSION"_"$OSVER"_"$ARCH.deb"
+RELEASEFILE="$PKGNAME"_"$VERSION"_ubuntu_"$OSVER"_"$ARCH.deb"
 
 rm -rf build try
 
